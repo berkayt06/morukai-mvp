@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #f7fbf7;
+  --ink: #0b1320;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, #16a34a, #22c55e, #84cc16, #22c55e, #16a34a);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shine 6s linear infinite;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgba(15,23,42,0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15,23,42,0.06) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+}
+
+/* Floating 3D-feel orbs used in landing background */
+.orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(60px);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.tilt-card {
+  transform: perspective(900px) rotateX(6deg) rotateY(-8deg);
+  transition: transform 400ms ease;
+}
+.tilt-card:hover {
+  transform: perspective(900px) rotateX(2deg) rotateY(-2deg) translateY(-4px);
+}
