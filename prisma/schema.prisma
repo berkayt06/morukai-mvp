@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SubscriptionStatus {
+  trial
+  active
+  past_due
+  canceled
+  inactive
+}
+
+enum MessageDirection {
+  inbound
+  outbound
+}
+
+enum ScheduledMessageType {
+  morning
+  midday
+  evening
+  custom
+}
+
+enum ScheduledStatus {
+  pending
+  sent
+  failed
+}
+
+model User {
+  id                  String              @id @default(cuid())
+  fullName            String
+  phoneNumber         String              @unique
+  age                 Int?
+  goal                String
+  currentSituation    String?
+  preferredTone       String
+  language            String              @default("tr")
+  timezone            String              @default("Europe/Istanbul")
+  dailyMessageTime    String              @default("09:00") // HH:mm
+  subscriptionStatus  SubscriptionStatus  @default(trial)
+  paytrCustomerId     String?
+  paytrSubscriptionId String?
+  isActive            Boolean             @default(true)
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  messages           Message[]
+  subscriptions      Subscription[]
+  scheduledMessages  ScheduledMessage[]
+}
+
+model Message {
+  id          String           @id @default(cuid())
+  userId      String
+  direction   MessageDirection
+  channel     String           @default("whatsapp")
+  content     String
+  aiGenerated Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model Subscription {
+  id                     String             @id @default(cuid())
+  userId                 String
+  provider               String             @default("paytr")
+  providerCustomerId     String?
+  providerSubscriptionId String?
+  status                 SubscriptionStatus @default(trial)
+  plan                   String
+  currentPeriodStart     DateTime?
+  currentPeriodEnd       DateTime?
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+
+  user                   User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model ScheduledMessage {
+  id            String                @id @default(cuid())
+  userId        String
+  messageType   ScheduledMessageType  @default(morning)
+  scheduledTime DateTime
+  status        ScheduledStatus       @default(pending)
+  sentAt        DateTime?
+  createdAt     DateTime              @default(now())
+
+  user          User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([status, scheduledTime])
+}
